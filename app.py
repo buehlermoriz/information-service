@@ -28,4 +28,14 @@ def request_open_ai():
     except Exception as e:
         return str(e)
 
+@app.route("/push_to_firebase", methods=["POST"])
+def push_to_firebase():
+    try:
+        body = request.get_json()
+
+        response = connectors.push_plant_to_firebase("tulip", "10")
+        return response
+    except Exception as e:
+        return str(e)
+    
 if __name__ == "__main__": app.run(debug=False,  host='0.0.0.0', port=8080)
