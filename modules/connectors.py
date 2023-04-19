@@ -4,6 +4,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 import requests
 import config
+import json
 
 OPEN_AI_KEY = config.OPEN_AI_KEY
 cred = credentials.Certificate(".env/firebase_key.json")
@@ -17,22 +18,29 @@ def request_open_ai(text: str, model: str, temp: float, max_tokens: int):
     return response["choices"][0]["text"]
 
 
-def push_plant_to_firebase(plant: str, height: str):
+def push_plant_to_firebase(id, common_name, scientific_name, img_url, synonyms, family):
     db = firestore.client()
  # Define the data for the new plant document
     data = {
-        'name': plant,
-        'height': height
+        'id': id,
+        'common_name': common_name,
+        'scientific_name': scientific_name,
+        'img_url': img_url,
+        'synonyms': synonyms,
+        'family': family
     }
 
     # Add the new document to the "plants" collection
-    doc_ref = db.collection('plants').document(plant)
+    doc_ref = db.collection('plants').document(str(id))
     doc_ref.set(data)
     return "success"
 
 def plantlookup(name: str):
     url = "https://trefle.io/api/v1/species/search?q=" + name + "&token=" + TREFLE_KEY
     response = requests.get(url).text
+    parsed_data = json.loads(response)
+    for plant in parsed_data['data']:
+        push_plant_to_firebase(plant["id"], plant["common_name"], plant["scientific_name"], plant["image_url"], plant["synonyms"], plant["family"])
     plant= response["data"][0]
 
     return plant
