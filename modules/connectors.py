@@ -2,11 +2,12 @@ import openai
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import requests
+import config
 
-
-
-OPEN_AI_KEY = "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"
-cred = credentials.Certificate(".env/lumela-2fb04-firebase-adminsdk-p8yj1-fc6b0b43d5.json")
+OPEN_AI_KEY = config.OPEN_AI_KEY
+cred = credentials.Certificate(".env/firebase_key.json")
+TREFLE_KEY = config.TREFLE_KEY
 firebase_admin.initialize_app(cred)
 
 def request_open_ai(text: str, model: str, temp: float, max_tokens: int):
@@ -28,3 +29,10 @@ def push_plant_to_firebase(plant: str, height: str):
     doc_ref = db.collection('plants').document(plant)
     doc_ref.set(data)
     return "success"
+
+def plantlookup(name: str):
+    url = "https://trefle.io/api/v1/species/search?q=" + name + "&token=" + TREFLE_KEY
+    response = requests.get(url).text
+    plant= response["data"][0]
+
+    return plant

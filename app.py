@@ -38,4 +38,17 @@ def push_to_firebase():
     except Exception as e:
         return str(e)
     
+@app.route("/get_plant")
+def get_plant():
+    try:
+        name = request.args.get('name')
+
+
+
+        # if plant is nowhere in the database
+        response = connectors.plantlookup(name)
+        return response
+    except Exception as e:
+        return str(e)
+    
 if __name__ == "__main__": app.run(debug=False,  host='0.0.0.0', port=8080)
