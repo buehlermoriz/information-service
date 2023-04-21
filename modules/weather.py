@@ -30,6 +30,7 @@ def get_weather(city: str):
     weather = {
         "city": parsed_data_now["name"],
         "weather": parsed_data_now["weather"][0]["description"],
+        "icon": parsed_data_now["weather"][0]["icon"],
         "temp": parsed_data_now["main"]["temp"],
         "feels_like": parsed_data_now["main"]["feels_like"],
         "temp_min": parsed_data_now["main"]["temp_min"],
@@ -40,30 +41,35 @@ def get_weather(city: str):
             {            
                 "date": parsed_data_forecast["list"][0]["dt"],
                 "weather": parsed_data_forecast["list"][0]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][0]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][0]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][0]["main"]["humidity"],
             },
             {
                 "date": parsed_data_forecast["list"][1]["dt"],
                 "weather": parsed_data_forecast["list"][1]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][1]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][1]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][1]["main"]["humidity"],
             },
             {
                 "date": parsed_data_forecast["list"][2]["dt"],
                 "weather": parsed_data_forecast["list"][2]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][2]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][2]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][2]["main"]["humidity"],
             },
             {
                 "date": parsed_data_forecast["list"][3]["dt"],
                 "weather": parsed_data_forecast["list"][3]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][3]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][3]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][3]["main"]["humidity"],
             },
             {
                 "date": parsed_data_forecast["list"][4]["dt"],
                 "weather": parsed_data_forecast["list"][4]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][4]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][4]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][4]["main"]["humidity"],
             },
