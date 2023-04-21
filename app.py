@@ -11,19 +11,6 @@ app = Flask(__name__, static_folder="./templates/static")
 def index():
     return "true"
 
-@app.route("/ai", methods=["POST"])
-def request_open_ai():
-    try:
-        body = request.get_json()
-
-        if "ai_request" not in body or body["ai_request"] is None or body["ai_request"].strip() == "":
-            return "error - no text given"
-        ai_request = body["ai_request"].strip()
-
-        new_text = plants.request_open_ai(ai_request)
-        return new_text
-    except Exception as e:
-        return str(e)
     
 @app.route("/get_plant")
 def get_plant():
