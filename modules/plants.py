@@ -10,6 +10,7 @@ import requests
 OPEN_AI_KEY = config.OPEN_AI_KEY
 PIXABAY_KEY = config.PIXABAY_KEY
 cred = credentials.Certificate(".env/firebase_key.json")
+placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2785f78d7d8d530b2dcb19e94a7e19ef01b6899578d6c5f76399f88c4a3d70e28f016267a7d9463c029aec451103a_640.jpg"
 
 firebase_admin.initialize_app(cred)
 
@@ -38,6 +39,7 @@ def generate_new_plant(name: str):
     ai_response = request_open_ai(prompt)
     # parse the API response as a dictionary
     api_dict = json.loads(ai_response.replace('\n', '').replace('[', '').replace(']', ''))
+    companion_plants = api_dict.get("companion_plants").split(',')
 
     # update the plant dictionary with the API data
     plant.update({
@@ -47,7 +49,7 @@ def generate_new_plant(name: str):
         "sun": api_dict.get("sun"),
         "water": api_dict.get("water"),
         "ph": api_dict.get("ph"),
-        "companion_plants": api_dict.get("companion_plants")
+        "companion_plants": companion_plants
     })
 
     #get plant image
@@ -65,11 +67,14 @@ def request_open_ai(text: str):
 
 def plant_image(name):
     #search for plant image via pixabay API
-    url="https://pixabay.com/api/?key="+PIXABAY_KEY+"&q="+name+"+Pflanze&image_type=photo&category=nature&per_page=3"
+    url="https://pixabay.com/api/?key="+PIXABAY_KEY+"&q="+name+"&image_type=photo&category=nature&per_page=3"
     response = requests.get(url).text
     parsed_data = json.loads(response)
-    img_url = parsed_data["hits"][0]["webformatURL"]
-    return img_url
+    if len(parsed_data["hits"]) > 0:
+        img_url = parsed_data["hits"][0]["webformatURL"]
+        return img_url
+    else:
+        return placeholder_img
 
 
 def push_plant_to_firebase(id, plant):
