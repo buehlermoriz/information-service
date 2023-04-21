@@ -9,16 +9,18 @@ import json
 OPEN_AI_KEY = config.OPEN_AI_KEY
 cred = credentials.Certificate(".env/firebase_key.json")
 TREFLE_KEY = config.TREFLE_KEY
+OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
+
 firebase_admin.initialize_app(cred)
 
-def request_open_ai(text: str, model: str, temp: float, max_tokens: int):
+def request_open_ai(text: str):
     openai.api_key = OPEN_AI_KEY
-    response = openai.Completion.create(model=model, prompt=text, temperature=temp, max_tokens=max_tokens)
+    response = openai.Completion.create(model="text-davinci-003", prompt=text, temperature=0.5, max_tokens=1000)
 
     return response["choices"][0]["text"]
 
 
-def push_plant_to_firebase(id, common_name, scientific_name, img_url, synonyms, family):
+def push_plant_to_firebase(id, common_name, scientific_name, img_url):
     db = firestore.client()
  # Define the data for the new plant document
     data = {
@@ -26,8 +28,6 @@ def push_plant_to_firebase(id, common_name, scientific_name, img_url, synonyms, 
         'common_name': common_name,
         'scientific_name': scientific_name,
         'img_url': img_url,
-        'synonyms': synonyms,
-        'family': family
     }
 
     # Add the new document to the "plants" collection
@@ -36,11 +36,36 @@ def push_plant_to_firebase(id, common_name, scientific_name, img_url, synonyms, 
     return "success"
 
 def plantlookup(name: str):
-    url = "https://trefle.io/api/v1/species/search?q=" + name + "&token=" + TREFLE_KEY
+    url = "https://trefle.io/api/v1/species/search?q=" + name +"&token=" + TREFLE_KEY
     response = requests.get(url).text
     parsed_data = json.loads(response)
-    for plant in parsed_data['data']:
-        push_plant_to_firebase(plant["id"], plant["common_name"], plant["scientific_name"], plant["image_url"], plant["synonyms"], plant["family"])
-    plant= response["data"][0]
+    first_response = parsed_data["data"][0]
+    plant = {
+        "id": first_response["id"],
+        "common_name": first_response["common_name"],
+        "scientific_name": first_response["scientific_name"],
+        "image_url": first_response["image_url"],
+    }
+    prompt = "Übersetze den folgenden Eintrag auf deutsch. Behalte die Formatierung bei. Ergänze die Information, mit welchen anderen Pflanzen die Planze gut zusammen wächst:" + str(plant)
+    ai_response = request_open_ai(prompt)
+    #push to firebase
+    #push_plant_to_firebase(plant["id"], plant["common_name"], plant["scientific_name"], plant["image_url"])
 
     return plant
+
+def get_lat_long(city: str):
+    url = "https://nominatim.openstreetmap.org/search?q="+city+"&format=json&limit=1"
+
+    response = requests.get(url).text
+    parsed_data = json.loads(response)
+    for data in parsed_data:
+        lat = data['lat']
+        long = data['lon']
+    return lat, long
+
+def get_weather(city: str):
+    lat, lon = get_lat_long(city)
+    url = "https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid=2d55c039196e807f27ea4b14fda8d789"
+    response = requests.get(url).text
+    parsed_data = json.loads(response)
+    return parsed_data

@@ -5,7 +5,7 @@ from modules import connectors
 app = Flask(__name__, static_folder="./templates/static")
 
 
-#url-routes
+#url-routes 
 @app.route('/')
 def index():
     return "true"
@@ -19,11 +19,7 @@ def request_open_ai():
             return "error - no text given"
         ai_request = body["ai_request"].strip()
 
-        model = "text-davinci-003" if "model" not in body else body["model"]
-        temp = 0.5 if "temperature" not in body else float(body["temperature"])
-        max_tokens = 1000 if "max_tokens" not in body else body["max_tokens"]
-
-        new_text = connectors.request_open_ai(ai_request, model, temp, max_tokens)
+        new_text = connectors.request_open_ai(ai_request)
         return new_text
     except Exception as e:
         return str(e)
@@ -42,11 +38,18 @@ def push_to_firebase():
 def get_plant():
     try:
         name = request.args.get('name')
-
-
-
         # if plant is nowhere in the database
         response = connectors.plantlookup(name)
+        return response
+    except Exception as e:
+        return str(e)
+    
+@app.route("/get_weather")
+def get_weather():
+    try:
+        city = request.args.get('city')
+        # if plant is nowhere in the database
+        response = connectors.get_weather(city)
         return response
     except Exception as e:
         return str(e)
