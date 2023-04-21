@@ -5,6 +5,7 @@ from firebase_admin import firestore
 import requests
 import config
 import json
+import uuid
 
 OPEN_AI_KEY = config.OPEN_AI_KEY
 cred = credentials.Certificate(".env/firebase_key.json")
@@ -20,36 +21,42 @@ def request_open_ai(text: str):
     return response["choices"][0]["text"]
 
 
-def push_plant_to_firebase(id, common_name, scientific_name, img_url):
+def push_plant_to_firebase(id, plant):
     db = firestore.client()
- # Define the data for the new plant document
-    data = {
-        'id': id,
-        'common_name': common_name,
-        'scientific_name': scientific_name,
-        'img_url': img_url,
-    }
 
     # Add the new document to the "plants" collection
     doc_ref = db.collection('plants').document(str(id))
-    doc_ref.set(data)
+    doc_ref.set(plant)
     return "success"
 
 def plantlookup(name: str):
-    url = "https://trefle.io/api/v1/species/search?q=" + name +"&token=" + TREFLE_KEY
-    response = requests.get(url).text
-    parsed_data = json.loads(response)
-    first_response = parsed_data["data"][0]
+    #plant lookup via treffle.io
+    # url = "https://trefle.io/api/v1/species/search?q=" + name +"&token=" + TREFLE_KEY
+    # response = requests.get(url).text
+    # parsed_data = json.loads(response)
+    # first_response = parsed_data["data"][0]
     plant = {
-        "id": first_response["id"],
-        "common_name": first_response["common_name"],
-        "scientific_name": first_response["scientific_name"],
-        "image_url": first_response["image_url"],
+        "id": uuid.uuid4().hex,
+        "common_name": name,
     }
-    prompt = "Übersetze den folgenden Eintrag auf deutsch. Behalte die Formatierung bei. Ergänze die Information, mit welchen anderen Pflanzen die Planze gut zusammen wächst:" + str(plant)
+    prompt = 'Liefere mir ein Array mit Daten über: \n ' + name + '\n mit den Informationen: \n "scientific_name": latein \n "description": ein Satz \n "harvest": Ein Wort aus Frühling, Sommer, Herbst, Winter \n "sun": ganzzahliger Wert zwischen 0 und 10 \n "water": ganzzahliger Wert zwischen 0 und 10 \n "ph": ganzzahliger Wert zwischen 0 und 14 \n "companion_plants": Aufzählung von Pflanzennamen getrennt mit einem Komma \n Beachte die Formatierungsvorgaben nach dem jeweiligen Doppelpunkt. \n Gibt es mehrere Pflanzen mit dieser Bezeichnung wähle die am weitesten verbreitete aus. \n Liefere mir nur das Array und keine weiteren Informationen oder Text zurück.'
     ai_response = request_open_ai(prompt)
+    # parse the API response as a dictionary
+    #ai_response = '\n\n[\n  "scientific_name": "Rubus fruticosus",\n  "description": "Die Brombeere ist eine krautige Pflanze, die ursprünglich aus Europa stammt und in vielen Teilen der Welt anzutreffen ist.",\n  "harvest": "Sommer",\n  "sun": 6,\n  "water": 5,\n  "ph": 6,\n  "companion_plants": "Gurke, Tomate, Paprika, Auberginen, Kohl"\n]'
+    api_dict = json.loads(ai_response.replace('\n', '').replace('[', '').replace(']', ''))
+
+# update the plant dictionary with the API data
+    plant.update({
+        "scientific_name": api_dict.get("scientific_name"),
+        "description": api_dict.get("description"),
+        "harvest": api_dict.get("harvest"),
+        "sun": api_dict.get("sun"),
+        "water": api_dict.get("water"),
+        "ph": api_dict.get("ph"),
+        "companion_plants": api_dict.get("companion_plants")
+    })
     #push to firebase
-    #push_plant_to_firebase(plant["id"], plant["common_name"], plant["scientific_name"], plant["image_url"])
+    push_plant_to_firebase(plant["id"], plant)
 
     return plant
 
