@@ -2,15 +2,12 @@ import openai
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-import requests
-import config
 import json
+import config
 import uuid
 
 OPEN_AI_KEY = config.OPEN_AI_KEY
 cred = credentials.Certificate(".env/firebase_key.json")
-TREFLE_KEY = config.TREFLE_KEY
-OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
 
 firebase_admin.initialize_app(cred)
 
@@ -69,19 +66,3 @@ def generate_new_plant(name: str):
     push_plant_to_firebase(plant["id"], plant)
     return plant
 
-def get_lat_long(city: str):
-    url = "https://nominatim.openstreetmap.org/search?q="+city+"&format=json&limit=1"
-
-    response = requests.get(url).text
-    parsed_data = json.loads(response)
-    for data in parsed_data:
-        lat = data['lat']
-        long = data['lon']
-    return lat, long
-
-def get_weather(city: str):
-    lat, lon = get_lat_long(city)
-    url = "https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid=2d55c039196e807f27ea4b14fda8d789"
-    response = requests.get(url).text
-    parsed_data = json.loads(response)
-    return parsed_data
