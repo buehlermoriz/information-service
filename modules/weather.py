@@ -1,14 +1,13 @@
 #keys
 import os
-from boto.s3.connection import S3Connection
-
 import requests
 import json
 
 # import config
 # OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
 
-OPENWEATHERMAP_KEY = S3Connection(os.environ['OPENWEATHERMAP_KEY'])
+OPENWEATHERMAP_KEY = os.environ.get('OPENWEATHERMAP_KEY')
+
 
 
 
