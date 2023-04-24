@@ -1,8 +1,8 @@
 import requests
 import json
-import config
+#import config
 
-OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
+OPENWEATHERMAP_KEY = "123"#config.OPENWEATHERMAP_KEY
 
 
 def get_lat_long(city: str):
