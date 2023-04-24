@@ -6,20 +6,21 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import json
-#import config
+import config
 import uuid
 import requests
 
 
-# OPEN_AI_KEY = config.OPEN_AI_KEY
-# PIXABAY_KEY = config.PIXABAY_KEY
+OPEN_AI_KEY = config.OPEN_AI_KEY
+PIXABAY_KEY = config.PIXABAY_KEY
+cred = credentials.Certificate("env/firebase_key.json")
 
-OPEN_AI_KEY = S3Connection(os.environ['OPEN_AI_KEY'])
-PIXABAY_KEY = S3Connection(os.environ['PIXABAY_KEY'])
-#cred = credentials.Certificate("env/firebase_key.json")
 placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2785f78d7d8d530b2dcb19e94a7e19ef01b6899578d6c5f76399f88c4a3d70e28f016267a7d9463c029aec451103a_640.jpg"
 
-#firebase_admin.initialize_app(cred)
+# OPEN_AI_KEY = S3Connection(os.environ['OPEN_AI_KEY'])
+# PIXABAY_KEY = S3Connection(os.environ['PIXABAY_KEY'])
+
+firebase_admin.initialize_app(cred)
 
 def plantlookup(name: str):
     #search for Plant in Firestore
@@ -63,7 +64,7 @@ def generate_new_plant(name: str):
     plant["image"] = plant_image(name)
 
     #push to firebase
-    # push_plant_to_firebase(plant["id"], plant)
+    push_plant_to_firebase(plant["id"], plant)
     return plant
 
 def request_open_ai(text: str):
@@ -85,9 +86,9 @@ def plant_image(name):
 
 
 def push_plant_to_firebase(id, plant):
-    #db = firestore.client()
+    db = firestore.client()
 
-    # Add the new document to the "plants" collection
-    #doc_ref = db.collection('plants').document(str(id))
-    #doc_ref.set(plant)
+    #Add the new document to the "plants" collection
+    doc_ref = db.collection('plants').document(str(id))
+    doc_ref.set(plant)
     return "success"
