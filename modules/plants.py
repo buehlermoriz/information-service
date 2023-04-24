@@ -19,7 +19,19 @@ placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2
 
 OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
 PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
-cred = credentials.Certificate(os.environ.get('FIREBASE_KEY'))
+cred = credentials.Certificate({
+  "type": "service_account",
+  "project_id": os.environ.get('project_id'),
+  "private_key_id": os.environ.get('private_key_id'),
+  "private_key": os.environ.get('private_key'),
+  "client_email": os.environ.get('client_email'),
+  "client_id": os.environ.get('client_id'),
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+}
+)
 
 firebase_admin.initialize_app(cred)
 
