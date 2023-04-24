@@ -1,3 +1,6 @@
+#keys
+import os
+from boto.s3.connection import S3Connection
 import openai
 import firebase_admin
 from firebase_admin import credentials
@@ -7,8 +10,12 @@ import json
 import uuid
 import requests
 
-OPEN_AI_KEY = "123"#config.OPEN_AI_KEY
-PIXABAY_KEY = "123"#config.PIXABAY_KEY
+
+# OPEN_AI_KEY = config.OPEN_AI_KEY
+# PIXABAY_KEY = config.PIXABAY_KEY
+
+OPEN_AI_KEY = S3Connection(os.environ['OPEN_AI_KEY'])
+PIXABAY_KEY = S3Connection(os.environ['PIXABAY_KEY'])
 cred = credentials.Certificate("env/firebase_key.json")
 placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2785f78d7d8d530b2dcb19e94a7e19ef01b6899578d6c5f76399f88c4a3d70e28f016267a7d9463c029aec451103a_640.jpg"
 

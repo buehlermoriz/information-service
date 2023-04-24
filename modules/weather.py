@@ -1,8 +1,15 @@
+#keys
+import os
+from boto.s3.connection import S3Connection
+
 import requests
 import json
-#import config
 
-OPENWEATHERMAP_KEY = "123"#config.OPENWEATHERMAP_KEY
+#import config
+#OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
+
+OPENWEATHERMAP_KEY = S3Connection(os.environ['OPENWEATHERMAP_KEY'])
+
 
 
 def get_lat_long(city: str):
