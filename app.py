@@ -31,4 +31,4 @@ def get_weather():
     except Exception as e:
         return str(e)
     
-if __name__ == "__main__": app.run(debug=False,  host='0.0.0.0', port=8080)
+if __name__ == "__main__": app.run(debug=True)
