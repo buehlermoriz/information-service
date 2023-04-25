@@ -19,27 +19,27 @@ import requests
 #----------------- DEPLOYMENT -----------------#
 OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
 PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
+FIREBASE_KEY = {
+   "type": "service_account",
+   "project_id": os.environ.get('project_id'),
+   "private_key_id": os.environ.get('private_key_id'),
+   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
+   "client_email": os.environ.get('client_email'),
+   "client_id": os.environ.get('client_id'),
+   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+   "token_uri": "https://oauth2.googleapis.com/token",
+   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+ }
+cred = credentials.Certificate(FIREBASE_KEY)
 #-------------------------------------------------#
 
 placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2785f78d7d8d530b2dcb19e94a7e19ef01b6899578d6c5f76399f88c4a3d70e28f016267a7d9463c029aec451103a_640.jpg"
 
-FIREBASE_KEY = {
-  "type": "service_account",
-  "project_id": os.environ.get('project_id'),
-  "private_key_id": os.environ.get('private_key_id'),
-  "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-  "client_email": os.environ.get('client_email'),
-  "client_id": os.environ.get('client_id'),
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
-}
-cred = credentials.Certificate(FIREBASE_KEY)
 
 firebase_admin.initialize_app(cred)
 
-def plantlookup(name: str):
+def plant_lookup(name: str):
     #search for Plant in Firestore
     db = firestore.client()
     docs = db.collection('plants').where('common_name', '==', name).get()
@@ -52,6 +52,21 @@ def plantlookup(name: str):
     else:
         plant = generate_new_plant(name)
         return plant
+    
+def plant_list_lookup(names: list):
+    #search for Plant in Firestore
+    db = firestore.client()
+    
+    # perform a query for all plants matching the common names
+    docs = db.collection('plants').where('id', 'in', names).get()
+
+    #if plant is in the database
+    if len(docs) > 0:
+        plants = [doc.to_dict() for doc in docs]
+        return plants
+    #if plant is nowhere in the database
+    else:
+        return "plants not found", 400
     
 
 def generate_new_plant(name: str):

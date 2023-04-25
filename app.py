@@ -12,11 +12,24 @@ def index():
     return "true"
 
     
-@app.route("/get_plant")
+@app.route("/get_plant", methods=['GET', 'POST'])
 def get_plant():
     try:
-        name = request.args.get('name')
-        response = plants.plantlookup(name)
+        #request single plant
+        if request.method == 'GET':
+            name = request.args.get('name')
+            if(name != None):
+                response = plants.plant_lookup(name)
+            else:
+                response = "No plant name provided.", 400
+        #request multiple plants
+        elif request.method == 'POST':
+            data = request.get_json()
+            name_list = data.get("names")
+            if name_list:
+                response = plants.plant_list_lookup(name_list)
+            else:
+                response = "No plant names provided.", 400
         return response
     except Exception as e:
         return str(e)
