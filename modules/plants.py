@@ -1,6 +1,4 @@
 #keys
-import os
-from boto.s3.connection import S3Connection
 import openai
 import firebase_admin
 from firebase_admin import credentials
@@ -8,36 +6,39 @@ from firebase_admin import firestore
 import json
 import uuid
 import requests
+from google.cloud import storage
+from datetime import datetime, timedelta
 
 #----------------- LOCAL TESTING -----------------#
-# import config
-# OPEN_AI_KEY = config.OPEN_AI_KEY
-# PIXABAY_KEY = config.PIXABAY_KEY
-# cred = credentials.Certificate("env/firebase_key.json")
+import config
+OPEN_AI_KEY = config.OPEN_AI_KEY
+PIXABAY_KEY = config.PIXABAY_KEY
+cred = credentials.Certificate("env/firebase_key.json")
+storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
-PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
-FIREBASE_KEY = {
-   "type": "service_account",
-   "project_id": os.environ.get('project_id'),
-   "private_key_id": os.environ.get('private_key_id'),
-   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-   "client_email": os.environ.get('client_email'),
-   "client_id": os.environ.get('client_id'),
-   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-   "token_uri": "https://oauth2.googleapis.com/token",
-   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
- }
-cred = credentials.Certificate(FIREBASE_KEY)
+# OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
+# PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
+# FIREBASE_KEY = {
+#    "type": "service_account",
+#    "project_id": os.environ.get('project_id'),
+#    "private_key_id": os.environ.get('private_key_id'),
+#    "private_key": os.environ.get('private_key').replace("\\n", "\n"),
+#    "client_email": os.environ.get('client_email'),
+#    "client_id": os.environ.get('client_id'),
+#    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#    "token_uri": "https://oauth2.googleapis.com/token",
+#    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+#    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+#  }
+# cred = credentials.Certificate(FIREBASE_KEY)
+#storage_client = storage.Client.from_service_account_json(FIREBASE_KEY)
 #-------------------------------------------------#
 
-placeholder_img = "https://pixabay.com/get/g3ea5c0ed6d9e4188af3264388e236188a0e2785f78d7d8d530b2dcb19e94a7e19ef01b6899578d6c5f76399f88c4a3d70e28f016267a7d9463c029aec451103a_640.jpg"
-
-
 firebase_admin.initialize_app(cred)
+bucket = storage_client.get_bucket('lumela-2fb04.appspot.com')
+
 
 def plant_lookup(name: str):
     #search for Plant in Firestore
@@ -47,6 +48,7 @@ def plant_lookup(name: str):
     #if plant is in the database
     if len(docs) > 0:
         plant = docs[0].to_dict()
+        plant = check_if_url_expired(plant)
         return plant
     #if plant is nowhere in the database
     else:
@@ -63,6 +65,8 @@ def plant_list_lookup(names: list):
     #if plant is in the database
     if len(docs) > 0:
         plants = [doc.to_dict() for doc in docs]
+        for plant in plants:
+            plant = check_if_url_expired(plant)
         return plants
     #if plant is nowhere in the database
     else:
@@ -93,10 +97,9 @@ def generate_new_plant(name: str):
     })
 
     #get plant image
-    plant["image"] = plant_image(name)
-
+    plant["firebase_path"], plant["img"] = request_open_ai_image(name)
     #push to firebase
-    push_plant_to_firebase(plant["id"], plant)
+    upload_plant(plant["id"], plant)
     return plant
 
 def request_open_ai(text: str):
@@ -105,22 +108,52 @@ def request_open_ai(text: str):
 
     return response["choices"][0]["text"]
 
-def plant_image(name):
-    #search for plant image via pixabay API
-    url="https://pixabay.com/api/?key="+PIXABAY_KEY+"&q="+name+"&image_type=photo&category=nature&per_page=3"
-    response = requests.get(url).text
-    parsed_data = json.loads(response)
-    if len(parsed_data["hits"]) > 0:
-        img_url = parsed_data["hits"][0]["webformatURL"]
-        return img_url
-    else:
-        return placeholder_img
+def request_open_ai_image(plant: str):
+    ai_prompt = "Eine" + plant + "in einem Garten bei gutem Wetter kurz nachdem es geregnet hat wobei die Pflanze von den ersten Sonnenstrahlen getroffen wird."
+    #ai_prompt = "A tomato bush with shiny tomatoes in the background in a garden. The bush is in focus. The sun is shining bright. Realistic"
+    #ai_prompt = "Generiere mir eie realistische Fotografie von "+plant + "in einem Garten bei gutem Wetter kurz nachdem es geregnet hat wobei die Pflanze von den ersten Sonnenstrahlen getroffen wird."
+    #ai_prompt = "Ein detailiertes Foto von der Pflanze einer / eines "+plant+" auf einem Tisch in einem minimalistischen Blumentopf, wenn möglich mit der Entsprechenden lecker aussehenden Frucht an der Pflanze und einer professionellen Beleuchtung sowie einem futuristischen Hintergrund als Imagebild für eine Gärtnerin oder einen Gärtner."
+    openai.api_key = OPEN_AI_KEY
+    response = openai.Image.create(
+    prompt=ai_prompt,
+    n=1,
+    size="1024x1024"
+    )
+    image_url = response['data'][0]['url']
+    firebase_path = upload_image(image_url, plant)
+    return firebase_path
 
-
-def push_plant_to_firebase(id, plant):
+def upload_plant(id, plant):
     db = firestore.client()
 
     #Add the new document to the "plants" collection
     doc_ref = db.collection('plants').document(str(id))
     doc_ref.set(plant)
     return "success"
+
+def upload_image(image_url, plant):
+    #get the image from the url
+    response = requests.get(image_url)
+    #upload image to firebase storage
+    blob = bucket.blob("plantimages/"+plant)
+    blob.upload_from_string(response.content, content_type=response.headers['content-type'])
+    url = blob.generate_signed_url(expiration=86400, version="v4")
+
+    return "plantimages/"+plant, url
+
+def check_if_url_expired(plant):
+    url = plant["img"]
+    upload_date = url.split("X-Goog-Date=")[-1].split("&")[0]
+    date_fmt = "%Y%m%dT%H%M%SZ"
+    expires = int(url.split("X-Goog-Expires=")[-1].split("&")[0])
+
+    expires_at = datetime.strptime(upload_date, date_fmt) + timedelta(seconds=expires)
+
+    if datetime.utcnow() >= expires_at:
+        # generate new URL
+        blob = bucket.blob(plant["firebase_path"])
+        url = blob.generate_signed_url(expiration=86400, version="v4")
+        plant["img"] = url
+        return plant
+    else:
+        return plant

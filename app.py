@@ -32,7 +32,7 @@ def get_plant():
                 response = "No plant names provided.", 400
         return response
     except Exception as e:
-        return str(e)
+        return str(e), 400
     
 @app.route("/get_weather")
 def get_weather():
@@ -40,6 +40,16 @@ def get_weather():
         city = request.args.get('city')
         # if plant is nowhere in the database
         response = weather.get_weather(city)
+        return response
+    except Exception as e:
+        return str(e), 400
+    
+@app.route("/get_img")
+def get_img():
+    try:
+        img = request.args.get('img')
+        # if plant is nowhere in the database
+        response = plants.request_open_ai_image(img)
         return response
     except Exception as e:
         return str(e)
