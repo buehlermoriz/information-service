@@ -43,12 +43,15 @@ def get_weather():
     except Exception as e:
         return str(e), 400
     
-@app.route("/get_img")
-def get_img():
+@app.route("/reload_plant")
+def reload_plant():
     try:
-        img = request.args.get('img')
-        # if plant is nowhere in the database
-        response = plants.request_open_ai_image(img)
+        name = request.args.get('name')
+        id = request.args.get('id')
+        if(name != None):
+            response = plants.generate_new_plant(name, id)
+        else:
+            response = "No plant name provided.", 400
         return response
     except Exception as e:
         return str(e)

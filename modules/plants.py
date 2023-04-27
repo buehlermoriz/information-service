@@ -74,10 +74,15 @@ def plant_list_lookup(names: list):
         return "plants not found", 400
     
 
-def generate_new_plant(name: str):
+def generate_new_plant(name: str, id: str = None):
+    #check if request is from reload plant. If it is from relaod plant, the provided id is used
+    if id:
+        plant_id = id
+    else:
+        plant_id = uuid.uuid4().hex
     #generate and upload new plant data
     plant = {
-        "id": uuid.uuid4().hex,
+        "id": plant_id,
         "common_name": name,
     }
     prompt = 'Liefere mir ein Array mit Daten über: \n ' + name + '\n mit den Informationen: \n {"scientific_name": latein \n "description": maximal drei Sätze \n "harvest": Ein Wort aus Frühling, Sommer, Herbst, Winter \n "sun": ganzzahliger Wert zwischen 0 und 10 \n "water": ganzzahliger Wert zwischen 0 und 10 \n "ph": ganzzahliger Wert zwischen 0 und 14 \n "companion_plants": Aufzählung von Pflanzennamen getrennt mit einem Komma} \n Beachte die Formatierungsvorgaben nach dem jeweiligen Doppelpunkt. \n Gibt es mehrere Pflanzen mit dieser Bezeichnung wähle die am weitesten verbreitete aus. \n Liefere mir nur das Array und keine weiteren Informationen oder Text zurück.'
