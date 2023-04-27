@@ -38,7 +38,6 @@ def get_plant():
 def get_weather():
     try:
         city = request.args.get('city')
-        # if plant is nowhere in the database
         response = weather.get_weather(city)
         return response
     except Exception as e:

@@ -4,3 +4,4 @@ venv
 .env
 env
 config.py
+.DS_Store

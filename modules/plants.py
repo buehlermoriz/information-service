@@ -10,30 +10,31 @@ from google.cloud import storage
 from datetime import datetime, timedelta
 
 #----------------- LOCAL TESTING -----------------#
-import config
-OPEN_AI_KEY = config.OPEN_AI_KEY
-PIXABAY_KEY = config.PIXABAY_KEY
-cred = credentials.Certificate("env/firebase_key.json")
-storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
+# import config
+# OPEN_AI_KEY = config.OPEN_AI_KEY
+# PIXABAY_KEY = config.PIXABAY_KEY
+# cred = credentials.Certificate("env/firebase_key.json")
+# storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-# OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
-# PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
-# FIREBASE_KEY = {
-#    "type": "service_account",
-#    "project_id": os.environ.get('project_id'),
-#    "private_key_id": os.environ.get('private_key_id'),
-#    "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-#    "client_email": os.environ.get('client_email'),
-#    "client_id": os.environ.get('client_id'),
-#    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#    "token_uri": "https://oauth2.googleapis.com/token",
-#    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-#    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
-#  }
-# cred = credentials.Certificate(FIREBASE_KEY)
-#storage_client = storage.Client.from_service_account_json(FIREBASE_KEY)
+import os
+OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
+PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
+FIREBASE_KEY = {
+   "type": "service_account",
+   "project_id": os.environ.get('project_id'),
+   "private_key_id": os.environ.get('private_key_id'),
+   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
+   "client_email": os.environ.get('client_email'),
+   "client_id": os.environ.get('client_id'),
+   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+   "token_uri": "https://oauth2.googleapis.com/token",
+   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+ }
+cred = credentials.Certificate(FIREBASE_KEY)
+storage_client = storage.Client.from_service_account_json(FIREBASE_KEY)
 #-------------------------------------------------#
 
 firebase_admin.initialize_app(cred)
@@ -110,9 +111,6 @@ def request_open_ai(text: str):
 
 def request_open_ai_image(plant: str):
     ai_prompt = "Eine" + plant + "in einem Garten bei gutem Wetter kurz nachdem es geregnet hat wobei die Pflanze von den ersten Sonnenstrahlen getroffen wird."
-    #ai_prompt = "A tomato bush with shiny tomatoes in the background in a garden. The bush is in focus. The sun is shining bright. Realistic"
-    #ai_prompt = "Generiere mir eie realistische Fotografie von "+plant + "in einem Garten bei gutem Wetter kurz nachdem es geregnet hat wobei die Pflanze von den ersten Sonnenstrahlen getroffen wird."
-    #ai_prompt = "Ein detailiertes Foto von der Pflanze einer / eines "+plant+" auf einem Tisch in einem minimalistischen Blumentopf, wenn möglich mit der Entsprechenden lecker aussehenden Frucht an der Pflanze und einer professionellen Beleuchtung sowie einem futuristischen Hintergrund als Imagebild für eine Gärtnerin oder einen Gärtner."
     openai.api_key = OPEN_AI_KEY
     response = openai.Image.create(
     prompt=ai_prompt,
