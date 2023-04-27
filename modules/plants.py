@@ -12,7 +12,6 @@ from datetime import datetime, timedelta
 #----------------- LOCAL TESTING -----------------#
 # import config
 # OPEN_AI_KEY = config.OPEN_AI_KEY
-# PIXABAY_KEY = config.PIXABAY_KEY
 # cred = credentials.Certificate("env/firebase_key.json")
 # storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
 #-------------------------------------------------#
@@ -20,7 +19,6 @@ from datetime import datetime, timedelta
 #----------------- DEPLOYMENT -----------------#
 import os
 OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
-PIXABAY_KEY = os.environ.get('PIXABAY_KEY')
 FIREBASE_KEY = {
    "type": "service_account",
    "project_id": os.environ.get('project_id'),
