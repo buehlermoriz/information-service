@@ -32,11 +32,11 @@ FIREBASE_KEY = {
    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
  }
 cred = credentials.Certificate(FIREBASE_KEY)
-storage_client = storage.Client.from_service_account_json(FIREBASE_KEY)
+#storage_client = storage.Client.from_service_account_json(FIREBASE_KEY)
 #-------------------------------------------------#
 
 firebase_admin.initialize_app(cred)
-bucket = storage_client.get_bucket('lumela-2fb04.appspot.com')
+#bucket = storage_client.get_bucket('lumela-2fb04.appspot.com')
 
 
 def plant_lookup(name: str):
@@ -131,10 +131,10 @@ def upload_image(image_url, plant):
     #get the image from the url
     response = requests.get(image_url)
     #upload image to firebase storage
-    blob = bucket.blob("plantimages/"+plant)
-    blob.upload_from_string(response.content, content_type=response.headers['content-type'])
-    url = blob.generate_signed_url(expiration=86400, version="v4")
-
+    # blob = bucket.blob("plantimages/"+plant)
+    # blob.upload_from_string(response.content, content_type=response.headers['content-type'])
+    # url = blob.generate_signed_url(expiration=86400, version="v4")
+    url = "https://storage.googleapis.com/lumela-2fb04.appspot.com/plantimages/Kirsche?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com%2F20230427%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20230427T063328Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=8925a110b8b5168b530500c13e11f9d273cba0b30efdabf6d5ede6deb0b01f57d91caf78f8611803cdca4093151898dfe6cd06c250eb9febf33c27dc636ddf5551587633ec0e4d11aad8f635e5426edd85e553ef217aeb5d4448b7413a7fc97c51b83aefe6d4f343980e9692f9e221fc670c55e8d01c22359f926ac2200ffcdfb0c6647a0a402e2fb440f561afb829fe828e1a83158e155b20c2c985736cbd45786b1caf096705564d2a2f0697060ecab161cde0ae240797b9003512a2fbc1a6e474e0e92d41105dc46d387f2d21df68d8540d8316bc066a5a08d9d0d900b98fc6e3c69f1a9c835690a89f1903aad60602be8f912dd1290d6902061ed14118de"
     return "plantimages/"+plant, url
 
 def check_if_url_expired(plant):
@@ -147,9 +147,9 @@ def check_if_url_expired(plant):
 
     if datetime.utcnow() >= expires_at:
         # generate new URL
-        blob = bucket.blob(plant["firebase_path"])
-        url = blob.generate_signed_url(expiration=86400, version="v4")
-        plant["img"] = url
+        # blob = bucket.blob(plant["firebase_path"])
+        # url = blob.generate_signed_url(expiration=86400, version="v4")
+        # plant["img"] = url
         return plant
     else:
         return plant
