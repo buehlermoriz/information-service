@@ -10,7 +10,7 @@ app = Flask(__name__, static_folder="./templates/static")
 #url-routes 
 @app.route('/')
 def index():
-    return "true"
+    return "false"
 
     
 @app.route("/get_plant", methods=['GET', 'POST'])

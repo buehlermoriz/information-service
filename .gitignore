@@ -5,3 +5,4 @@ venv
 env
 config.py
 .DS_Store
+keys.json
