@@ -6,3 +6,5 @@ env
 config.py
 .DS_Store
 keys.json
+main.yml
+.github/workflows/main.yml
