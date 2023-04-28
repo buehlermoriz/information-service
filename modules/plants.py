@@ -22,11 +22,11 @@ import os
 OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
 FIREBASE_KEY = {
    "type": "service_account",
-   "project_id": os.environ.get('project_id'),
+   "project_id":"lumela-2fb04",
    "private_key_id": os.environ.get('private_key_id'),
    "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-   "client_email": os.environ.get('client_email'),
-   "client_id": os.environ.get('client_id'),
+  "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
+  "client_id": "109723090998767991936",
    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
    "token_uri": "https://oauth2.googleapis.com/token",
    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",

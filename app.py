@@ -1,6 +1,7 @@
 from flask import Flask, request
 from modules import plants
 from modules import weather
+import os
 
 
 app = Flask(__name__, static_folder="./templates/static")
@@ -56,4 +57,4 @@ def reload_plant():
     except Exception as e:
         return str(e)
     
-if __name__ == "__main__": app.run()
+if __name__ == "__main__": app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
