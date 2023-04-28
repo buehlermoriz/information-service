@@ -8,7 +8,7 @@ env:
   PROJECT_ID: lumela-384408
   SERVICE: information-be
   REGION: europe-west3
-  APP_ID: continous-deployment
+  APP_ID: information-be
 
 
 jobs:
