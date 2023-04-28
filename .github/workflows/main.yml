@@ -1,4 +1,5 @@
-# .github/workflows/deploy.yml
+- name: Checkout code
+  uses: actions/checkout@v2
 name: Deploy to Cloud Run
 on:
   push:
