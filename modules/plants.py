@@ -73,6 +73,23 @@ def plant_list_lookup(names: list):
     else:
         return "plants not found", 400
     
+def all_plants():
+    #search for Plant in Firestore
+    db = firestore.client()
+    
+    # perform a query for all plants matching the common names
+    docs = db.collection('plants').get()
+
+    #if plant is in the database
+    if len(docs) > 0:
+        plants = [doc.to_dict() for doc in docs]
+        for plant in plants:
+            plant = check_if_url_expired(plant)
+        return plants
+    #if plant is nowhere in the database
+    else:
+        return "plants not found", 400
+    
 
 def generate_new_plant(name: str, id: str = None):
     #check if request is from reload plant. If it is from relaod plant, the provided id is used

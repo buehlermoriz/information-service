@@ -22,7 +22,7 @@ def get_plant():
             if(name != None):
                 response = plants.plant_lookup(name)
             else:
-                response = "No plant name provided.", 400
+                response = plants.all_plants()
         #request multiple plants
         elif request.method == 'POST':
             data = request.get_json()
