@@ -116,6 +116,8 @@ def generate_new_plant(name: str, id: str = None):
         "sun": api_dict.get("sun"),
         "water": api_dict.get("water"),
         "ph": api_dict.get("ph"),
+        "toxic_level": api_dict.get("toxic_level"),
+        "taste": api_dict.get("taste"),
         "companion_plants": companion_plants
     })
 
