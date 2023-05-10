@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from modules import plants
 from modules import weather
+from modules import bed
 import os
 
 
@@ -56,5 +57,41 @@ def reload_plant():
         return response
     except Exception as e:
         return str(e)
+      
+@app.route("/compleete_bed", methods=['POST'])
+def compleete_bed():
+    try:
+        data = request.get_json()
+        if data:
+            #gather data
+            bedId = data.get("bedId")
+            light = data.get("light")
+            water = data.get("water")
+            soil = data.get("soil")
+            time = data.get("time")
+            alignment = data.get("alignment")
+
+            #get plant Names
+            plantIds = data.get("plantIds")
+            plant_names = plants.plant_list_lookup(plantIds)
+            common_names = []
+            for plant in plant_names:
+                common_names.append(plant['common_name'])
+            plant_names_str = ", ".join(common_names)
+
+
+            #create plantbed
+            companion_plant_names = bed.find_companion_plants(light, water, plant_names_str, soil, time, alignment)
+            companion_plant_ids = []
+            for plant_name in companion_plant_names:
+                plant = plants.plant_lookup(plant_name)
+                companion_plant_ids.append(plant['id'])
+            
+            return response, 200
+        else:
+            response = "No plantbed provided.", 400
+        return response
+    except Exception as e:
+        return str(e), 400
     
 if __name__ == "__main__": app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

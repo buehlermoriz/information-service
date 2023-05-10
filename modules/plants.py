@@ -1,5 +1,4 @@
 #keys
-import openai
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -9,32 +8,30 @@ import requests
 from google.cloud import storage
 from google.oauth2 import service_account
 from datetime import datetime, timedelta
+from modules import openai
 
 #----------------- LOCAL TESTING -----------------#
-# import config
-# OPEN_AI_KEY = config.OPEN_AI_KEY
-# cred = credentials.Certificate("env/firebase_key.json")
-# storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
+cred = credentials.Certificate("env/firebase_key.json")
+storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-import os
-OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
-FIREBASE_KEY = {
-   "type": "service_account",
-   "project_id":"lumela-2fb04",
-   "private_key_id": os.environ.get('private_key_id'),
-   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-  "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
-  "client_id": "109723090998767991936",
-   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-   "token_uri": "https://oauth2.googleapis.com/token",
-   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
- }
-cred = credentials.Certificate(FIREBASE_KEY)
-credentials = service_account.Credentials.from_service_account_info(FIREBASE_KEY)
-storage_client = storage.Client(credentials=credentials)
+# import os
+# FIREBASE_KEY = {
+#    "type": "service_account",
+#    "project_id":"lumela-2fb04",
+#    "private_key_id": os.environ.get('private_key_id'),
+#    "private_key": os.environ.get('private_key').replace("\\n", "\n"),
+#   "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
+#   "client_id": "109723090998767991936",
+#    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#    "token_uri": "https://oauth2.googleapis.com/token",
+#    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+#    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+#  }
+# cred = credentials.Certificate(FIREBASE_KEY)
+# credentials = service_account.Credentials.from_service_account_info(FIREBASE_KEY)
+# storage_client = storage.Client(credentials=credentials)
 #-------------------------------------------------#
 
 firebase_admin.initialize_app(cred)
@@ -103,7 +100,7 @@ def generate_new_plant(name: str, id: str = None):
         "common_name": name,
     }
     prompt = 'Liefere mir ein Array mit Daten über: \n ' + name + '\n mit den Informationen: \n {"scientific_name": latein \n "description": maximal drei Sätze \n "harvest": Ein Wort aus Frühling, Sommer, Herbst, Winter \n "sun": ganzzahliger Wert zwischen 0 und 5 \n "water": ganzzahliger Wert zwischen 0 und 5 \n "ph": ganzzahliger Wert zwischen 0 und 14 \n "companion_plants": Aufzählung von Pflanzennamen getrennt mit einem Komma \n "toxic_level": wert zwischen 0 und 4 (0=nicht giftig, 1= wenig giftig, 2= gifitig, 3=stark giftig, 4=sehr stark gifitg) \n "taste": Wähle zwischen den Geschmacksrichtungen Umami, Süß, Sauer, Salzig, Bitter} \n Beachte die Formatierungsvorgaben nach dem jeweiligen Doppelpunkt. \n Gibt es mehrere Pflanzen mit dieser Bezeichnung wähle die am weitesten verbreitete aus. \n Liefere mir nur das Array und keine weiteren Informationen oder Text zurück.'
-    ai_response = request_open_ai(prompt)
+    ai_response = openai.request_open_ai(prompt)
     # parse the API response as a dictionary
     api_dict = json.loads(ai_response.replace('\n', '').replace('[', '').replace(']', ''))
     companion_plants = api_dict.get("companion_plants").split(',')
@@ -122,28 +119,11 @@ def generate_new_plant(name: str, id: str = None):
     })
 
     #get plant image
-    plant["firebase_path"], plant["img"] = request_open_ai_image(name)
+    image_url, plant_img = openai.request_open_ai_image(name)
+    plant["firebase_path"], plant["img"] = upload_image(image_url, plant_img)
     #push to firebase
     upload_plant(plant["id"], plant)
     return plant
-
-def request_open_ai(text: str):
-    openai.api_key = OPEN_AI_KEY
-    response = openai.Completion.create(model="text-davinci-003", prompt=text, temperature=0.5, max_tokens=1000)
-
-    return response["choices"][0]["text"]
-
-def request_open_ai_image(plant: str):
-    ai_prompt = "Eine" + plant + "in einem Garten bei gutem Wetter kurz nachdem es geregnet hat wobei die Pflanze von den ersten Sonnenstrahlen getroffen wird."
-    openai.api_key = OPEN_AI_KEY
-    response = openai.Image.create(
-    prompt=ai_prompt,
-    n=1,
-    size="1024x1024"
-    )
-    image_url = response['data'][0]['url']
-    firebase_path = upload_image(image_url, plant)
-    return firebase_path
 
 def upload_plant(id, plant):
     db = firestore.client()
