@@ -86,8 +86,8 @@ def compleete_bed():
             for plant_name in companion_plant_names:
                 plant = plants.plant_lookup(plant_name)
                 companion_plant_ids.append(plant['id'])
-            
-            return companion_plant_ids, 200
+            return_value = companion_plant_ids
+            return return_value, 200
         else:
             response = "No plantbed provided.", 400
         return response
