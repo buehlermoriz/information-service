@@ -11,27 +11,27 @@ from datetime import datetime, timedelta
 from modules import openai
 
 #----------------- LOCAL TESTING -----------------#
-cred = credentials.Certificate("env/firebase_key.json")
-storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
+# cred = credentials.Certificate("env/firebase_key.json")
+# storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-# import os
-# FIREBASE_KEY = {
-#    "type": "service_account",
-#    "project_id":"lumela-2fb04",
-#    "private_key_id": os.environ.get('private_key_id'),
-#    "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-#   "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
-#   "client_id": "109723090998767991936",
-#    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#    "token_uri": "https://oauth2.googleapis.com/token",
-#    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-#    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
-#  }
-# cred = credentials.Certificate(FIREBASE_KEY)
-# credentials = service_account.Credentials.from_service_account_info(FIREBASE_KEY)
-# storage_client = storage.Client(credentials=credentials)
+import os
+FIREBASE_KEY = {
+   "type": "service_account",
+   "project_id":"lumela-2fb04",
+   "private_key_id": os.environ.get('private_key_id'),
+   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
+  "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
+  "client_id": "109723090998767991936",
+   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+   "token_uri": "https://oauth2.googleapis.com/token",
+   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
+ }
+cred = credentials.Certificate(FIREBASE_KEY)
+credentials = service_account.Credentials.from_service_account_info(FIREBASE_KEY)
+storage_client = storage.Client(credentials=credentials)
 #-------------------------------------------------#
 
 firebase_admin.initialize_app(cred)

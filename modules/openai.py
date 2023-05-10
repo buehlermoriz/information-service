@@ -1,11 +1,12 @@
 import openai
 #----------------- LOCAL TESTING -----------------#
-import config
-OPEN_AI_KEY = config.OPEN_AI_KEY
+# import config
+# OPEN_AI_KEY = config.OPEN_AI_KEY
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-# OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
+import os
+OPEN_AI_KEY = os.environ.get('OPEN_AI_KEY')
 #-------------------------------------------------#
 
 def request_open_ai(text: str):

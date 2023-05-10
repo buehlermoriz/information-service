@@ -4,12 +4,12 @@ import requests
 import json
 
 #----------------- LOCAL TESTING -----------------#
-import config
-OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
+# import config
+# OPENWEATHERMAP_KEY = config.OPENWEATHERMAP_KEY
 #-------------------------------------------------#
 
 #----------------- DEPLOYMENT -----------------#
-# OPENWEATHERMAP_KEY = os.environ.get('OPENWEATHERMAP_KEY')
+OPENWEATHERMAP_KEY = os.environ.get('OPENWEATHERMAP_KEY')
 #-------------------------------------------------#
 
 
