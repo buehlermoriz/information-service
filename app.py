@@ -118,7 +118,8 @@ def check_compatibility():
             if plant_fits_bed[0] < 3:
                 return_value = str(plant_fits_bed[0])
             else:
-                return_value = plants.plant_lookup(name)
+                plant = plants.plant_lookup(name)
+                return_value = plant['id']
 
 
             return return_value, 200
