@@ -64,7 +64,6 @@ def compleete_bed():
         data = request.get_json()
         if data:
             #gather data
-            bedId = data.get("bedId")
             light = data.get("light")
             water = data.get("water")
             soil = data.get("soil")
@@ -94,4 +93,39 @@ def compleete_bed():
     except Exception as e:
         return str(e), 400
     
+#check if plant fits in bed
+@app.route("/check_compatibility", methods=['POST'])
+def check_compatibility():
+    try:
+        name = request.args.get('name')
+        data = request.get_json()
+        if data:
+            #gather data
+            light = data.get("light")
+            water = data.get("water")
+            soil = data.get("soil")
+            time = data.get("time")
+            alignment = data.get("alignment")
+
+            #get plant Names
+            plantIds = data.get("plantIds")
+            plant_names = plants.plant_list_lookup(plantIds)
+            common_names = []
+            for plant in plant_names:
+                common_names.append(plant['common_name'])
+            plant_names_str = ", ".join(common_names)
+            plant_fits_bed = bed.check_plant_compatibility(light, water, soil, time, alignment, plant_names_str, name)
+            if plant_fits_bed[0] < 3:
+                return_value = str(plant_fits_bed[0])
+            else:
+                return_value = plants.plant_lookup(name)
+
+
+            return return_value, 200
+        else:
+            response = "No plantbed provided.", 400
+        return response
+    except Exception as e:
+        return str(e), 400
+
 if __name__ == "__main__": app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
