@@ -21,7 +21,7 @@ def request_open_ai_image(plant: str):
     response = openai.Image.create(
     prompt=ai_prompt,
     n=1,
-    size="1024x1024"
+    size="256x256"
     )
     image_url = response['data'][0]['url']
     return image_url, plant

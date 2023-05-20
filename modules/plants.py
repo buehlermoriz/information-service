@@ -7,8 +7,9 @@ import uuid
 import requests
 from google.cloud import storage
 from google.oauth2 import service_account
-from datetime import datetime, timedelta
 from modules import openai
+from PIL import Image
+from io import BytesIO
 
 #----------------- LOCAL TESTING -----------------#
 # cred = credentials.Certificate("env/firebase_key.json")
@@ -46,7 +47,6 @@ def plant_lookup(name: str):
     #if plant is in the database
     if len(docs) > 0:
         plant = docs[0].to_dict()
-        #plant = check_if_url_expired(plant)
         return plant
     #if plant is nowhere in the database
     else:
@@ -63,8 +63,6 @@ def plant_list_lookup(names: list):
     #if plant is in the database
     if len(docs) > 0:
         plants = [doc.to_dict() for doc in docs]
-        #for plant in plants:
-            #plant = check_if_url_expired(plant)
         return plants
     #if plant is nowhere in the database
     else:
@@ -80,8 +78,6 @@ def all_plants():
     #if plant is in the database
     if len(docs) > 0:
         plants = [doc.to_dict() for doc in docs]
-        #for plant in plants:
-           # plant = check_if_url_expired(plant)
         return plants
     #if plant is nowhere in the database
     else:
@@ -136,25 +132,21 @@ def upload_plant(id, plant):
 def upload_image(image_url, plant):
     #get the image from the url
     response = requests.get(image_url)
+    #compressing the image
+    img = compress_img(response)
     #upload image to firebase storage
     blob = bucket.blob("plantimages/"+plant)
-    url =blob.upload_from_string(response.content, content_type=response.headers['content-type'])
+    url =blob.upload_from_string(img, content_type=response.headers['content-type'])
     url = blob.public_url
     return "plantimages/"+plant, url
 
-def check_if_url_expired(plant):
-    url = plant["img"]
-    upload_date = url.split("X-Goog-Date=")[-1].split("&")[0]
-    date_fmt = "%Y%m%dT%H%M%SZ"
-    expires = int(url.split("X-Goog-Expires=")[-1].split("&")[0])
+def compress_img(response):
+    #compressing the image
+    img = Image.open(BytesIO(response.content))
+    img.thumbnail((128, 128), Image.ANTIALIAS)
 
-    expires_at = datetime.strptime(upload_date, date_fmt) + timedelta(seconds=expires)
+    # Create an in-memory buffer to store the compressed image
+    output_buffer = BytesIO()
 
-    if datetime.utcnow() >= expires_at:
-        # generate new URL
-        blob = bucket.blob(plant["firebase_path"])
-        url = blob.generate_signed_url(expiration=86400, version="v4")
-        plant["img"] = url
-        return plant
-    else:
-        return plant
+    img.save(output_buffer, format='JPEG', quality=80)
+    return output_buffer.getvalue()
