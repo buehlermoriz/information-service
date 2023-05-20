@@ -68,7 +68,7 @@ def plant_list_lookup(names: list):
         return plants
     #if plant is nowhere in the database
     else:
-        return "plants not found", 400
+        return "ERROR - info_service - plants.py - plant_list_lookup: Die angefragten Pflanzen ("+str(names)+") einer der angefragten Beete existieren nicht! Wahrschienlich wurden diese manuell gelöscht. Bitte werfe einen Blick in den Firestore, oder melde dich bei mir (Moriz)", 400
     
 def all_plants():
     #search for Plant in Firestore
