@@ -46,7 +46,7 @@ def plant_lookup(name: str):
     #if plant is in the database
     if len(docs) > 0:
         plant = docs[0].to_dict()
-        plant = check_if_url_expired(plant)
+        #plant = check_if_url_expired(plant)
         return plant
     #if plant is nowhere in the database
     else:
@@ -63,8 +63,8 @@ def plant_list_lookup(names: list):
     #if plant is in the database
     if len(docs) > 0:
         plants = [doc.to_dict() for doc in docs]
-        for plant in plants:
-            plant = check_if_url_expired(plant)
+        #for plant in plants:
+            #plant = check_if_url_expired(plant)
         return plants
     #if plant is nowhere in the database
     else:
@@ -80,8 +80,8 @@ def all_plants():
     #if plant is in the database
     if len(docs) > 0:
         plants = [doc.to_dict() for doc in docs]
-        for plant in plants:
-            plant = check_if_url_expired(plant)
+        #for plant in plants:
+           # plant = check_if_url_expired(plant)
         return plants
     #if plant is nowhere in the database
     else:
@@ -138,8 +138,8 @@ def upload_image(image_url, plant):
     response = requests.get(image_url)
     #upload image to firebase storage
     blob = bucket.blob("plantimages/"+plant)
-    blob.upload_from_string(response.content, content_type=response.headers['content-type'])
-    url = blob.generate_signed_url(expiration=86400, version="v4")
+    url =blob.upload_from_string(response.content, content_type=response.headers['content-type'])
+    url = blob.public_url
     return "plantimages/"+plant, url
 
 def check_if_url_expired(plant):
