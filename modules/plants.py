@@ -10,6 +10,8 @@ from google.oauth2 import service_account
 from modules import openai
 from PIL import Image
 from io import BytesIO
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 #----------------- LOCAL TESTING -----------------#
 # cred = credentials.Certificate("env/firebase_key.json")
@@ -42,10 +44,18 @@ bucket = storage_client.get_bucket('lumela-2fb04.appspot.com')
 def plant_lookup(name: str):
     #search for Plant in Firestore
     db = firestore.client()
-    docs = db.collection('plants').where('common_name', '==', name).get()
+    plant_collection = db.collection('plants')
+    docs = plant_collection.get()
 
     #if plant is in the database
     if len(docs) > 0:
+        # Perform fuzzy matching to find the closest match
+        best_match = process.extractOne(name, [doc.get('common_name') for doc in docs])
+        if best_match[1] > 85:
+            plant_name = best_match[0]
+            plant_doc = plant_collection.where('common_name', '==', plant_name).get()[0]
+            plant = plant_doc.to_dict()
+            return plant
         plant = docs[0].to_dict()
         return plant
     #if plant is nowhere in the database
