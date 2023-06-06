@@ -25,7 +25,7 @@ def generate_text_content(CLIENT, BUCKET):
     text = json.loads(ai_response.replace('\n', ''))
 
     #generate img
-    img_prompt = "Erstelle ein Bild für den Text in einem hochwertigen Gartenmagazin. Der Text hat die Überschrift" + text["headline"]+ "Das Bild sollte zur Saison und zum Wetter passen. Heute ist der " + str(today) + " und es ist " + sky + " bei " + str(temperature) + " Grad."
+    img_prompt = "Erstelle ein natürliches Bild aus einem schönen Garten für den Text in einem Gartenmagazin. Der Text hat die Überschrift" + text["headline"]+ "."
     img_url, txt_id = openai.request_open_ai_image(plant=txt_id, prompt=img_prompt, img_size="512x512")
 
     #build data for firestore
