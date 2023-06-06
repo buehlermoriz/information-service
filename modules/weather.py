@@ -54,6 +54,7 @@ def get_weather(city: str):
                 "icon": parsed_data_forecast["list"][0]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][0]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][0]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][0]["wind"]["speed"],
             },
             {
                 "date": parsed_data_forecast["list"][1]["dt"],
@@ -61,6 +62,8 @@ def get_weather(city: str):
                 "icon": parsed_data_forecast["list"][1]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][1]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][1]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][1]["wind"]["speed"],
+
             },
             {
                 "date": parsed_data_forecast["list"][2]["dt"],
@@ -68,6 +71,8 @@ def get_weather(city: str):
                 "icon": parsed_data_forecast["list"][2]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][2]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][2]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][2]["wind"]["speed"],
+
             },
             {
                 "date": parsed_data_forecast["list"][3]["dt"],
@@ -75,6 +80,8 @@ def get_weather(city: str):
                 "icon": parsed_data_forecast["list"][3]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][3]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][3]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][3]["wind"]["speed"],
+
             },
             {
                 "date": parsed_data_forecast["list"][4]["dt"],
@@ -82,6 +89,8 @@ def get_weather(city: str):
                 "icon": parsed_data_forecast["list"][4]["weather"][0]["icon"],
                 "temp": parsed_data_forecast["list"][4]["main"]["temp"],
                 "humidity": parsed_data_forecast["list"][4]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][4]["wind"]["speed"],
+
             },
         ],
     }
