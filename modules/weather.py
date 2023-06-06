@@ -34,7 +34,7 @@ def get_weather(city: str):
     parsed_data_now = json.loads(response_now)
 
     #wetter forecast
-    url_forecast = "https://api.openweathermap.org/data/2.5/forecast?lat="+lat+"&lon="+long+"&appid="+OPENWEATHERMAP_KEY+"&units=metric&lang=de&cnt=5"
+    url_forecast = "https://api.openweathermap.org/data/2.5/forecast?lat="+lat+"&lon="+long+"&appid="+OPENWEATHERMAP_KEY+"&units=metric&lang=de"
     response_forecast = requests.get(url_forecast).text
     parsed_data_forecast = json.loads(response_forecast)
     weather = {
@@ -49,47 +49,47 @@ def get_weather(city: str):
         "wind_speed": parsed_data_now["wind"]["speed"],
         "forecast": [        
             {            
-                "date": parsed_data_forecast["list"][0]["dt"],
-                "weather": parsed_data_forecast["list"][0]["weather"][0]["description"],
-                "icon": parsed_data_forecast["list"][0]["weather"][0]["icon"],
-                "temp": parsed_data_forecast["list"][0]["main"]["temp"],
-                "humidity": parsed_data_forecast["list"][0]["main"]["humidity"],
-                "wind_speed": parsed_data_forecast["list"][0]["wind"]["speed"],
+                "date": parsed_data_forecast["list"][8]["dt"],
+                "weather": parsed_data_forecast["list"][8]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][8]["weather"][0]["icon"],
+                "temp": parsed_data_forecast["list"][8]["main"]["temp"],
+                "humidity": parsed_data_forecast["list"][8]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][8]["wind"]["speed"],
             },
             {
-                "date": parsed_data_forecast["list"][1]["dt"],
-                "weather": parsed_data_forecast["list"][1]["weather"][0]["description"],
-                "icon": parsed_data_forecast["list"][1]["weather"][0]["icon"],
-                "temp": parsed_data_forecast["list"][1]["main"]["temp"],
-                "humidity": parsed_data_forecast["list"][1]["main"]["humidity"],
-                "wind_speed": parsed_data_forecast["list"][1]["wind"]["speed"],
+                "date": parsed_data_forecast["list"][16]["dt"],
+                "weather": parsed_data_forecast["list"][16]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][16]["weather"][0]["icon"],
+                "temp": parsed_data_forecast["list"][16]["main"]["temp"],
+                "humidity": parsed_data_forecast["list"][16]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][16]["wind"]["speed"],
 
             },
             {
-                "date": parsed_data_forecast["list"][2]["dt"],
-                "weather": parsed_data_forecast["list"][2]["weather"][0]["description"],
-                "icon": parsed_data_forecast["list"][2]["weather"][0]["icon"],
-                "temp": parsed_data_forecast["list"][2]["main"]["temp"],
-                "humidity": parsed_data_forecast["list"][2]["main"]["humidity"],
-                "wind_speed": parsed_data_forecast["list"][2]["wind"]["speed"],
+                "date": parsed_data_forecast["list"][24]["dt"],
+                "weather": parsed_data_forecast["list"][24]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][24]["weather"][0]["icon"],
+                "temp": parsed_data_forecast["list"][24]["main"]["temp"],
+                "humidity": parsed_data_forecast["list"][24]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][24]["wind"]["speed"],
 
             },
             {
-                "date": parsed_data_forecast["list"][3]["dt"],
-                "weather": parsed_data_forecast["list"][3]["weather"][0]["description"],
-                "icon": parsed_data_forecast["list"][3]["weather"][0]["icon"],
-                "temp": parsed_data_forecast["list"][3]["main"]["temp"],
-                "humidity": parsed_data_forecast["list"][3]["main"]["humidity"],
-                "wind_speed": parsed_data_forecast["list"][3]["wind"]["speed"],
+                "date": parsed_data_forecast["list"][32]["dt"],
+                "weather": parsed_data_forecast["list"][32]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][32]["weather"][0]["icon"],
+                "temp": parsed_data_forecast["list"][32]["main"]["temp"],
+                "humidity": parsed_data_forecast["list"][32]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][32]["wind"]["speed"],
 
             },
             {
-                "date": parsed_data_forecast["list"][4]["dt"],
-                "weather": parsed_data_forecast["list"][4]["weather"][0]["description"],
-                "icon": parsed_data_forecast["list"][4]["weather"][0]["icon"],
-                "temp": parsed_data_forecast["list"][4]["main"]["temp"],
-                "humidity": parsed_data_forecast["list"][4]["main"]["humidity"],
-                "wind_speed": parsed_data_forecast["list"][4]["wind"]["speed"],
+                "date": parsed_data_forecast["list"][39]["dt"],
+                "weather": parsed_data_forecast["list"][39]["weather"][0]["description"],
+                "icon": parsed_data_forecast["list"][39]["weather"][0]["icon"],
+                "temp": parsed_data_forecast["list"][39]["main"]["temp"],
+                "humidity": parsed_data_forecast["list"][39]["main"]["humidity"],
+                "wind_speed": parsed_data_forecast["list"][39]["wind"]["speed"],
 
             },
         ],
