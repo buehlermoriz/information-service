@@ -1,49 +1,16 @@
 #keys
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
 import json
 import uuid
 import requests
-from google.cloud import storage
-from google.oauth2 import service_account
 from modules import openai
-from PIL import Image
-from io import BytesIO
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-
-#----------------- LOCAL TESTING -----------------#
-# cred = credentials.Certificate("env/firebase_key.json")
-# storage_client = storage.Client.from_service_account_json("env/firebase_key.json")
-#-------------------------------------------------#
-
-#----------------- DEPLOYMENT -----------------#
-import os
-FIREBASE_KEY = {
-   "type": "service_account",
-   "project_id":"lumela-2fb04",
-   "private_key_id": os.environ.get('private_key_id'),
-   "private_key": os.environ.get('private_key').replace("\\n", "\n"),
-  "client_email": "firebase-adminsdk-p8yj1@lumela-2fb04.iam.gserviceaccount.com",
-  "client_id": "109723090998767991936",
-   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-   "token_uri": "https://oauth2.googleapis.com/token",
-   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-p8yj1%40lumela-2fb04.iam.gserviceaccount.com"
- }
-cred = credentials.Certificate(FIREBASE_KEY)
-credentials = service_account.Credentials.from_service_account_info(FIREBASE_KEY)
-storage_client = storage.Client(credentials=credentials)
-#-------------------------------------------------#
-
-firebase_admin.initialize_app(cred)
-bucket = storage_client.get_bucket('lumela-2fb04.appspot.com')
+from modules import firebase
 
 
-def plant_lookup(name: str):
+def plant_lookup(name: str, CLIENT, BUCKET):
     #search for Plant in Firestore
-    db = firestore.client()
+    db = CLIENT
     plant_collection = db.collection('plants')
     docs = plant_collection.get()
 
@@ -60,12 +27,12 @@ def plant_lookup(name: str):
         return plant
     #if plant is nowhere in the database
     else:
-        plant = generate_new_plant(name)
+        plant = generate_new_plant(name, CLIENT, BUCKET)
         return plant
     
-def plant_list_lookup(names: list):
+def plant_list_lookup(names: list, CLIENT):
     #search for Plant in Firestore
-    db = firestore.client()
+    db = CLIENT
     
     # perform a query for all plants matching the common names
     docs = db.collection('plants').where('id', 'in', names).get()
@@ -78,9 +45,9 @@ def plant_list_lookup(names: list):
     else:
         return "ERROR - info_service - plants.py - plant_list_lookup: Die angefragten Pflanzen ("+str(names)+") einer der angefragten Beete existieren nicht! Wahrschienlich wurden diese manuell gelöscht. Bitte werfe einen Blick in den Firestore, oder melde dich bei mir (Moriz)", 400
     
-def all_plants():
+def all_plants(CLIENT):
     #search for Plant in Firestore
-    db = firestore.client()
+    db = CLIENT
     
     # perform a query for all plants matching the common names
     docs = db.collection('plants').get()
@@ -94,7 +61,7 @@ def all_plants():
         return "plants not found", 400
     
 
-def generate_new_plant(name: str, id: str = None):
+def generate_new_plant(name: str, CLIENT, BUCKET, id: str = None):
     #check if request is from reload plant. If it is from relaod plant, the provided id is used
     if id:
         plant_id = id
@@ -126,37 +93,7 @@ def generate_new_plant(name: str, id: str = None):
 
     #get plant image
     image_url, plant_img = openai.request_open_ai_image(name)
-    plant["firebase_path"], plant["img"] = upload_image(image_url, plant_img)
+    plant["firebase_path"], plant["img"] = firebase.upload_image(image_url, plant_img, "plantimages/",128, BUCKET)
     #push to firebase
-    upload_plant(plant["id"], plant)
+    firebase.upload_plant(plant["id"], plant, "plants", CLIENT)
     return plant
-
-def upload_plant(id, plant):
-    db = firestore.client()
-
-    #Add the new document to the "plants" collection
-    doc_ref = db.collection('plants').document(str(id))
-    doc_ref.set(plant)
-    return "success"
-
-def upload_image(image_url, plant):
-    #get the image from the url
-    response = requests.get(image_url)
-    #compressing the image
-    img = compress_img(response)
-    #upload image to firebase storage
-    blob = bucket.blob("plantimages/"+plant)
-    url =blob.upload_from_string(img, content_type=response.headers['content-type'])
-    url = blob.public_url
-    return "plantimages/"+plant, url
-
-def compress_img(response):
-    #compressing the image
-    img = Image.open(BytesIO(response.content))
-    img.thumbnail((128, 128), Image.ANTIALIAS)
-
-    # Create an in-memory buffer to store the compressed image
-    output_buffer = BytesIO()
-
-    img.save(output_buffer, format='JPEG', quality=80)
-    return output_buffer.getvalue()
