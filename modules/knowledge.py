@@ -20,7 +20,7 @@ def generate_text_content(CLIENT, BUCKET):
     txt_id = str(uuid.uuid4())
     
     #generate text
-    txt_prompt = 'Erstelle einen interessanten und lustigen Wissenstext für ein Gartenmagazin in der Kategorie ' + category + 'Der Text sollte zur Saison und zum Wetter passen beschrenke dich auch auf eine spezifische Aufgabe oder ein spezifisches Gartenprojekt. Heute ist der ' + str(today) + ' und es ist ' + sky + ' bei ' + str(temperature) + ' Grad. Die Luftfeuchtigkeit beträgt ' + str(humidity) + ' Prozent und der Wind weht mit ' + str(wind_speed) + ' km/h. Liefere das Ergebnis als Array in folgendem Format zurück: {"text": "Hier ist der Text", "headline": "Hier eine passende Überschrift"}'
+    txt_prompt = 'Erstelle einen interessanten, lustigen und langen Wissenstext für ein Gartenmagazin in der Kategorie ' + category + 'Der Text sollte zur Saison und zum Wetter passen beschrenke dich auch auf eine spezifische Aufgabe oder ein spezifisches Gartenprojekt. Heute ist der ' + str(today) + ' und es ist ' + sky + ' bei ' + str(temperature) + ' Grad. Die Luftfeuchtigkeit beträgt ' + str(humidity) + ' Prozent und der Wind weht mit ' + str(wind_speed) + ' km/h. Liefere das Ergebnis als Array in folgendem Format zurück: {"text": "Hier ist der Text", "headline": "Hier eine passende Überschrift"}'
     ai_response = openai.request_open_ai(txt_prompt)
     text = json.loads(ai_response.replace('\n', ''))
 
