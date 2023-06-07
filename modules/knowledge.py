@@ -8,7 +8,7 @@ import uuid
 
 def generate_text_content(CLIENT, BUCKET):
     #generate text parameters
-    categories = ["diy", "pflegetipps", "inspiration"]
+    categories = ["Diy", "Pflegetipps", "Inspiration"]
     category = random.choice(categories)
     today = datetime.today().strftime('%d.%m.%Y')
     weather_now = weather.get_weather("Mosbach")
