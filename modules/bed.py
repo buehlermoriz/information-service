@@ -50,7 +50,7 @@ def generate_create_prompt(light, water, plant_names_str, soil, time, alignment)
     time_lv = work_levels.get(time, 'unbekannt')
 
     
-    prompt = 'Ich plane ein neues Gartenbeet und suche Pflanzen, welche ich darin anbauen kann. Wo das Beet aufgebaut wird ist es '+light_lv+' sonnig. Das Beet ist in Richtung '+alignment+' ausgerichtet. Für die Versorgung des Beets habe ich '+water_lv+' Wasser zur Verfügung. Auf jeden Fall will ich folgende Pflanzen in meinem Beet anbauen: '+plant_names_str+'. Der Boden in meinem besteht aus viel '+soil+'. Ich habe für mein Beet '+time_lv+' Zeit. Bitte liefere mir ein array mit dem Namen "pflanzen" für die Verarbeitung in Python mit 10 weiteren Pflanzen, welche ich anhand der gegebenen Parameter in meinem Beet anbauen sollte.'
+    prompt = 'Ich plane ein neues Gartenbeet und suche Pflanzen, welche ich darin anbauen kann. Wo das Beet aufgebaut wird ist es '+light_lv+' sonnig. Das Beet ist in Richtung '+alignment+' ausgerichtet. Für die Versorgung des Beets habe ich '+water_lv+' Wasser zur Verfügung. Auf jeden Fall will ich folgende Pflanzen in meinem Beet anbauen: '+plant_names_str+'. Der Boden in meinem besteht aus viel '+soil+'. Ich habe für mein Beet '+time_lv+' Zeit. Bitte liefere mir ein array mit dem Namen "pflanzen" für die Verarbeitung in Python mit 10 weiteren (unterschiedlichen) Pflanzen, welche ich anhand der gegebenen Parameter in meinem Beet anbauen sollte.'
 
     return prompt
 
