@@ -35,7 +35,6 @@ def generate_text_content(CLIENT, BUCKET):
     
     #upload
     text["firebase_path"], text["img"] = firebase.upload_image(img_url, txt_id, "knowledge/",512, BUCKET)
-    text["firebase_thumbnail"], text["img"] = firebase.upload_image(img_url, txt_id, "knowledge_thumbnails/",128, BUCKET)
     #push to firebase
     firebase.upload_plant(txt_id, text, "knowledge", CLIENT)
 
