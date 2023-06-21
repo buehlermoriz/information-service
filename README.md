@@ -1,5 +1,8 @@
 # plant-service
 
-this Service delivers plant information
+Dieser Service ist für die Verbindung zu Datenquellen zuständig und Liefert Informationen zu den Pflanzen, dem Wetter und der Wissensseite.
 
-to deploy this fire commit to the main branch and add in your commitmessage "to deploy" e.g. "added new xzy to deploy"
+Um den Service lokal zu nutzen sind folgende Schritte notwendig:
+- (optional) Erstellen Sie eine virtuelle Umgebung (venv) über ```python3 -m venv venv``` und aktivieren Sie diese über ```source venv/bin/activate```
+- Installieren Sie die benötigten Pakete über ```pip install -r requirements.txt```
+- Starten Sie den Service über ```python3 app.py``` oder über den Pfeil oben rechts in VSCode.
