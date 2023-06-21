@@ -181,7 +181,10 @@ def get_article():
         if id != None:
             response = knowledge.get_single_article(id,CLIENT)
         else:
-            response = knowledge.get_all_articles(CLIENT)
+            filter_count = request.args.get('filter_count')
+            filter_category = request.args.get('filter_category')
+            response = knowledge.get_all_articles(CLIENT, filter_count, filter_category)
+
         return response
     except Exception as e:
         return str(e)

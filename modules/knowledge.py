@@ -5,6 +5,8 @@ import random
 from datetime import datetime
 import json
 import uuid
+from collections import defaultdict
+
 
 def generate_text_content(CLIENT, BUCKET):
     #generate text parameters
@@ -35,12 +37,13 @@ def generate_text_content(CLIENT, BUCKET):
     
     #upload
     text["firebase_path"], text["img"] = firebase.upload_image(img_url, txt_id, "knowledge/",512, BUCKET)
+    text["firebase_thumbnail"], text["img"] = firebase.upload_image(img_url, txt_id, "knowledge_thumbnails/",256, BUCKET)
     #push to firebase
     firebase.upload_plant(txt_id, text, "knowledge", CLIENT)
 
     return text
 
-def get_all_articles(CLIENT):
+def get_all_articles(CLIENT, filter_count, filter_category):
     #search for Plant in Firestore
     db = CLIENT
     
@@ -49,8 +52,46 @@ def get_all_articles(CLIENT):
 
     #if plant is in the database
     if len(docs) > 0:
-        articles = [doc.to_dict() for doc in docs]
-        return articles
+        if filter_count:
+            articles_by_category = defaultdict(list)
+
+             # Group articles by category
+            for doc in docs:
+                article = doc.to_dict()
+                category = article['category']
+                articles_by_category[category].append(article)
+
+            # Sort articles in each category by date (newest first)
+            for category, articles in articles_by_category.items():
+                articles.sort(key=lambda x: x['date'], reverse=True)
+
+            # Retrieve the five newest articles for each category
+            top_articles = {}
+            for category, articles in articles_by_category.items():
+                top_articles[category] = articles[:int(filter_count)]
+
+            return top_articles
+        elif filter_category:
+            articles_by_category = {}
+
+            # Group articles by category
+            for doc in docs:
+                article = doc.to_dict()
+                article_category = article['category']
+                if article_category not in articles_by_category:
+                    articles_by_category[article_category] = []
+                articles_by_category[article_category].append(article)
+
+            # If category is specified, return all articles for that category
+            if filter_category in articles_by_category:
+                return articles_by_category[filter_category]
+            # Otherwise, return all articles for all categories
+            else:
+                return "The given Category does not exist"
+        else:
+            articles = [doc.to_dict() for doc in docs]
+            return articles
+
     #if plant is nowhere in the database
     else:
         return "articles not found", 400
