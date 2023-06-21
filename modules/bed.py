@@ -45,8 +45,8 @@ def generate_create_prompt(light, water, plant_names_str, soil, time, alignment)
     'Mittel': 'mittelmäßig viel',
     'Hoch': 'sehr viel',
     }
-    light_lv = light_levels.get(light, 'unbekannt')
-    water_lv = water_levels.get(water, 'unbekannt')
+    light_lv = light_levels.get(int(light), 'unbekannt')
+    water_lv = water_levels.get(int(water), 'unbekannt')
     time_lv = work_levels.get(time, 'unbekannt')
 
     
@@ -77,8 +77,8 @@ def generate_check_prompt(light, water, plant_names_str, soil, time, alignment, 
     'Mittel': 'mittelmäßig viel',
     'Hoch': 'sehr viel',
     }
-    light_lv = light_levels.get(light, 'unbekannt')
-    water_lv = water_levels.get(water, 'unbekannt')
+    light_lv = light_levels.get(int(light), 'unbekannt')
+    water_lv = water_levels.get(int(water), 'unbekannt')
     time_lv = work_levels.get(time, 'unbekannt')
 
     

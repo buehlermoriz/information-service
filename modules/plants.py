@@ -23,8 +23,9 @@ def plant_lookup(name: str, CLIENT, BUCKET):
             plant_doc = plant_collection.where('common_name', '==', plant_name).get()[0]
             plant = plant_doc.to_dict()
             return plant
-        plant = docs[0].to_dict()
-        return plant
+        else:
+            plant = generate_new_plant(name, CLIENT, BUCKET)
+            return plant
     #if plant is nowhere in the database
     else:
         plant = generate_new_plant(name, CLIENT, BUCKET)
