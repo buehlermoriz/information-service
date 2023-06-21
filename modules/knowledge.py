@@ -55,7 +55,7 @@ def get_all_articles(CLIENT, filter_count, filter_category):
         if filter_count:
             articles_by_category = defaultdict(list)
 
-             # Group articles by category
+            # Group articles by category
             for doc in docs:
                 article = doc.to_dict()
                 category = article['category']
@@ -66,9 +66,9 @@ def get_all_articles(CLIENT, filter_count, filter_category):
                 articles.sort(key=lambda x: x['date'], reverse=True)
 
             # Retrieve the five newest articles for each category
-            top_articles = {}
-            for category, articles in articles_by_category.items():
-                top_articles[category] = articles[:int(filter_count)]
+            top_articles = []
+            for articles in articles_by_category.values():
+                top_articles.extend(articles[:int(filter_count)])
 
             return top_articles
         elif filter_category:
