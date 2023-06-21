@@ -8,14 +8,13 @@ from fuzzywuzzy import process
 from modules import firebase
 
 
-def plant_lookup(name: str, CLIENT, BUCKET):
+def plant_lookup(name: str, plant_id: str, CLIENT, BUCKET):
     #search for Plant in Firestore
     db = CLIENT
     plant_collection = db.collection('plants')
-    docs = plant_collection.get()
 
-    #if plant is in the database
-    if len(docs) > 0:
+    if name:
+        docs = plant_collection.get()
         # Perform fuzzy matching to find the closest match
         best_match = process.extractOne(name, [doc.get('common_name') for doc in docs])
         if best_match[1] > 85:
@@ -26,10 +25,13 @@ def plant_lookup(name: str, CLIENT, BUCKET):
         else:
             plant = generate_new_plant(name, CLIENT, BUCKET)
             return plant
-    #if plant is nowhere in the database
-    else:
-        plant = generate_new_plant(name, CLIENT, BUCKET)
+    elif plant_id:
+        plant_doc = plant_collection.where('id', '==', plant_id).get()[0]
+        plant = plant_doc.to_dict()
         return plant
+    else:
+        return "ERROR - info_service - plants.py - plant_lookup: Es wurde weder ein Name noch eine ID angegeben. Bitte überprüfe deine Anfrage."
+
     
 def plant_list_lookup(names: list, CLIENT):
     #search for Plant in Firestore

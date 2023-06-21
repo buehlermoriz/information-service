@@ -55,8 +55,9 @@ def get_plant():
         #request single plant
         if request.method == 'GET':
             name = request.args.get('name')
-            if(name != None):
-                response = plants.plant_lookup(name,CLIENT, BUCKET)
+            plant_id = request.args.get('plant_id')
+            if(name != None or plant_id != None):
+                response = plants.plant_lookup(name, plant_id, CLIENT, BUCKET)
             else:
                 response = plants.all_plants(CLIENT)
         #request multiple plants
