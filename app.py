@@ -57,7 +57,7 @@ def get_plant():
             name = request.args.get('name')
             plant_id = request.args.get('plant_id')
             if(name != None or plant_id != None):
-                response = plants.plant_lookup(name, plant_id, CLIENT, BUCKET)
+                response = plants.plant_lookup( CLIENT, BUCKET, name, plant_id)
             else:
                 response = plants.all_plants(CLIENT)
         #request multiple plants
@@ -119,7 +119,7 @@ def compleete_bed():
             companion_plant_names = bed.find_companion_plants(light, water, plant_names_str, soil, time, alignment)
             companion_plant_ids = []
             for plant_name in companion_plant_names:
-                plant = plants.plant_lookup(plant_name, CLIENT, BUCKET)
+                plant = plants.plant_lookup(CLIENT, BUCKET, plant_name)
                 companion_plant_ids.append(plant['id'])
             return_value = companion_plant_ids
             return return_value, 200
@@ -154,7 +154,7 @@ def check_compatibility():
             if plant_fits_bed[0] < 3:
                 return_value = str(plant_fits_bed[0])
             else:
-                plant = plants.plant_lookup(name, CLIENT, BUCKET)
+                plant = plants.plant_lookup(CLIENT, BUCKET, name)
                 return_value = plant['id']
 
 

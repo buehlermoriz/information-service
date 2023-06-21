@@ -8,7 +8,7 @@ from fuzzywuzzy import process
 from modules import firebase
 
 
-def plant_lookup(name: str, plant_id: str, CLIENT, BUCKET):
+def plant_lookup(CLIENT, BUCKET, name: str, plant_id: str = None):
     #search for Plant in Firestore
     db = CLIENT
     plant_collection = db.collection('plants')
